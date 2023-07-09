@@ -9,9 +9,12 @@ GET
 - /api/cars?year[lt]=2015&amp;year[sort]=asc&amp;dataType=excel - Экспорт в xlsx
 - /api/cars/{id} - Единичная запись
 - /api/mark/{name} - Получить модели марки
+
 POST
 - /api/cars - Добавление машины (name, number, vin_code, color)
+
 PUT
 - /api/cars/{id} - Редактирование
+
 DELETE
 - /api/cars/{id} - Удаление
