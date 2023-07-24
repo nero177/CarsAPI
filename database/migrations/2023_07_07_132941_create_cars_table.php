@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('number');
-            $table->string('color')->nullable();
             $table->string('vin_code')->unique();
-            $table->string('mark')->nullable();
-            $table->string('model')->nullable();
+            $table->string('color')->nullable();
             $table->string('year')->nullable();
+            $table->string('mark_api_id')->nullable();
+            $table->foreign('mark_api_id')->references('api_id')->on('marks');
             $table->timestamps();
         });
     }

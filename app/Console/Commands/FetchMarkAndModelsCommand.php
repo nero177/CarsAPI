@@ -4,7 +4,8 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Mark;
-use App\Models\MarkModel;
+use App\Jobs\FetchModelsForMarks;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 
 class FetchMarkAndModelsCommand extends Command
 {
@@ -28,23 +29,21 @@ class FetchMarkAndModelsCommand extends Command
     public function handle()
     {
         $marks = httpGetJson('https://vpic.nhtsa.dot.gov/api/vehicles/GetAllMakes?format=json');
+        $marks = $marks['Results'];
+        $data = [];
 
-        foreach ($marks['Results'] as $mark) {
-            $createdMark = Mark::firstOrCreate([
+        foreach ($marks as $mark) {
+            $data['marks'][] = [
                 'name' => $mark['Make_Name'],
-            ]);
+                'api_id' => $mark['Make_ID'],
+            ];
+        }
 
-            $markId = $mark['Make_ID'];
-            $models = httpGetJson("https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMakeId/$markId?format=json");
+        $data['marks'] = array_chunk($data['marks'], 100);
 
-            if(!isset($models['Results']) || empty($models['Results'])) continue;
-
-            foreach ($models['Results'] as $model) {
-                MarkModel::firstOrCreate([
-                    'name' => $model['Model_Name'],
-                    'mark_id' => $createdMark->id,
-                ]);
-            }
+        foreach ($data['marks'] as $chunk) {
+            Mark::upsert($chunk, ['api_id', 'name']);
+            FetchModelsForMarks::dispatch($chunk);
         }
 
         $this->info('Car marks and models fetched and stored successfully!');

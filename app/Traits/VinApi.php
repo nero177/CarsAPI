@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Services;
+namespace App\Traits;
 
-class VinApi
+trait VinApi
 {
-    static public function getCarDataByVin($vinCode)
+    public function getCarDataByVin($vinCode)
     {
         $apiUrl = "https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/$vinCode?format=json";
         $jsonData = httpGetJson($apiUrl);
@@ -12,9 +12,9 @@ class VinApi
 
         foreach($jsonData['Results'] as $result){
             if($result['Variable'] === 'Make'){
-                $data['mark'] = $result['Value'];
+                $data['mark_api_id'] = $result['ValueId'];
             } else if ($result['Variable'] === 'Model'){
-                $data['model'] = $result['Value'];
+                $data['model_api_id'] = $result['ValueId'];
             } else if ($result['Variable'] === 'Model Year'){
                 $data['year'] = $result['Value'];
             }

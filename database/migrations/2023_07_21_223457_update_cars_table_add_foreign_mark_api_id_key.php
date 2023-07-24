@@ -11,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('mark_models', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->unsignedBigInteger('mark_id');
-            $table->foreign('mark_id')->references('id')->on('marks')->onDelete('cascade');
-            $table->timestamps();
+        Schema::table('cars', function (Blueprint $table){
+            $table->string('model_api_id')->nullable();
+            $table->foreign('model_api_id')->references('api_id')->on('mark_models');
         });
     }
 
@@ -25,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('mark_models');
+        Schema::table('cars', function(Blueprint $table){
+            $table->dropColumn('model_api_id');
+        });
     }
 };
